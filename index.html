@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Meine Mixtapes</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			var Mixtapes = {
+				posToSeconds : function (pos) {
+					var splittedPos = pos.split(':');
+					switch (splittedPos.length) {
+						case 1:
+							return parseFloat(splittedPos[0]);
+						case 2:
+							return parseInt(splittedPos[0]) * 60 + parseFloat(splittedPos[1]);
+						case 3:
+							return parseInt(splittedPos[0]) * 60 * 60 + parseInt(splittedPos[1]) * 60 + parseFloat(splittedPos[2]);
+					}
+				}
+			}
+			$(function(){
+				$('.tracklist>a').click(function(e) {
+					e.preventDefault();
+					$target = $(e.target);
+					if ($target.text() == 'zeigen') {
+						$target.text('verbergen');
+						$target.next('.tracks').slideDown();
+					} else {
+						$target.text('zeigen');
+						$target.next('.tracks').slideUp();
+					}
+				});
+				$('.tracks a').live('click', function(e) {
+					e.preventDefault();
+					$target = $(e.target);
+					var pos = $target.parent().data('pos');
+					var audio = $target.closest('.mixtape').find('audio')[0];
+					audio.currentTime = pos;
+				});
+				$('.marker').live('click', function(e) {
+					e.preventDefault();
+					$target = $(e.target);
+					var pos = $target.data('pos');
+					var audio = $target.closest('.mixtape').find('audio')[0];
+					audio.currentTime = pos;
+				});
+				$('.stamp').click(function(e) {
+					e.preventDefault();
+					$target = $(e.target);
+					var audio = $target.closest('.mixtape').find('audio')[0];
+					console.log(audio.currentTime);
+				});
+
+				$('.tracks').each(function(tracksIndex, tracks) {
+					$tracks = $(tracks);
+					var $markers = $($tracks.parent().siblings('.waveform').find('.markers')[0]);
+					var duration = parseFloat($tracks.parent().parent().data('duration'));
+					$tracks.find('li').each(function (trackIndex, track) {
+						$track = $(track);
+						var pos = parseFloat($track.data('pos'));
+						var percent = parseInt(pos / duration * 100);
+						$markers.append('<div class="marker" data-pos="' + pos + '" style="left:' + percent + '%;"></div>');
+					});
+				});
+
+				$('audio').bind('timeupdate', function() {
+					var percent = (parseFloat(this.currentTime) / parseFloat(this.duration) * 100);
+					$(this).siblings('.waveform').find('.progress').css('width', percent + '%');
+				});
+			});
+		</script>
+		<style type="text/css">
+			body {
+				font-family: sans-serif;
+				font-size: 15px;
+				background: #E5DABA;
+			}
+			h1, h2, h3 {
+				color: #E46964;
+				margin: 0;
+				pading: 0;
+			}
+			h2 {
+				margin-bottom: 15px;
+			}
+			a {
+				color: #9F8668;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+			ul {
+				margin: 15px 0 0 0;
+			}
+			audio {
+				width: 100%;
+				margin: 15px 0;
+			}
+			.wrapper {
+				width: 565px;
+				margin: 10px auto;
+			}
+			.mixtape {
+				border: 3px solid #9F8668;
+				padding: 15px;
+				margin: 15px;
+				background: #AED4BF;
+			}
+			.cover {
+				margin: 15px 0;
+			}
+			.tracklist {
+				margin: 0;
+			}
+			.waveform {
+				margin-top: 15px;
+				height: 25px;
+				width: 100%;
+				position: relative;
+				background: #E5DABA;
+			}
+			.progress {
+				height: 100%;
+				position: absolute;
+				left: 0;
+				background: #E46964;
+				opacity: 0.5;
+				width: 0%;
+			}
+			.markers {
+				width: 100%;
+				height: 100%;
+			}
+			.marker {
+				position: absolute;
+				height: 100%;
+				width: 1px;
+				border-left: 1px solid red;
+				cursor: pointer;
+			}
+			@media handheld, screen and (max-width: 620px) {
+				img {
+					width: 100%;
+				}
+				.mixtape {
+					margin: 0;
+				}
+				.wrapper {
+					width: 80%;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrapper">
+			<h1>Meine Mixtapes</h1>
+			<div class="mixtape" data-duration="1907">
+				<h2>Guten Morgen</h2>
+				<div class="cover">
+					<img src="guten-morgen.jpg" />
+				</div>
+				<div class="tracklist">
+					<h3>Tracklist</h3>
+					<a href="#">zeigen</a>
+					<ul class="tracks" style="display: none;">
+						<li data-pos="0"><a href="#">The Ordinary Me - Evacuate</a></li>
+						<li data-pos="231"><a href="#">The Kooks - Naive</a></li>
+						<li data-pos="430"><a href="#">Thursday - War all the Time</a></li>
+						<li data-pos="694"><a href="#">Thrice - Digital Sea</a></li>
+						<li data-pos="916"><a href="#">At The Drive In - Enfilade</a></li>
+						<li data-pos="1164"><a href="#">The Dillinger Escape Plan - Black Bubblegum</a></li>
+						<li data-pos="1391"><a href="#">La Dispute - Such Small Hand</a></li>
+						<li data-pos="1456"><a href="#">Thrice - The Weight</a></li>
+						<li data-pos="1728"><a href="#">Moving Mountains - My Life Is Like A Chase Dream (And I'm Still Having Chase Dreams)</a></li>
+					</ul>
+				</div>
+				<div class="waveform">
+					<div class="progress"></div>
+					<div class="markers"></div>
+				</div>
+				<audio controls="controls">
+					<source src="guten-morgen.mp3" type="audio/mp3" />
+					<source src="guten-morgen.ogg" type="audio/ogg" />
+				</audio>
+				<a href="guten-morgen.mp3">download</a>
+			</div>
+
+			<div class="mixtape" data-duration="1951">
+				<h2>Schönen Feierabend</h2>
+				<div class="cover">
+					<img src="schoenen-feierabend.jpg" />
+				</div>
+				<div class="tracklist">
+					<h3>Tracklist</h3>
+					<a href="#">zeigen</a>
+					<ul class="tracks" style="display: none;">
+						<li data-pos="0"><a href="#">Dead Poetic Taste The Red Hands</a></li>
+						<li data-pos="176"><a href="#">Escapado - Freiraum</a></li>
+						<li data-pos="345"><a href="#">Foo Fighters - Wheels</a></li>
+						<li data-pos="608"><a href="#">Funeral For A Friend - History</a></li>
+						<li data-pos="797"><a href="#">Alien Ant Farm - Attitude</a></li>
+						<li data-pos="1088"><a href="#">City and Colou - We Found Each Other</a></li>
+						<li data-pos="1343"><a href="#">Papa Roach - Tight Rope</a></li>
+						<li data-pos="1609"><a href="#">Finch - Ender</a></li>
+					</ul>
+				</div>
+				<div class="waveform">
+					<div class="progress"></div>
+					<div class="markers"></div>
+				</div>
+				<audio controls="controls">
+					<source src="schoenen-feierabend.mp3" type="audio/mp3" />
+					<source src="schoenen-feierabend.ogg" type="audio/ogg" />
+				</audio>
+				<a href="schoenen-feierabend.mp3">download</a>
+			</div>
+		</div>
+	</body>
+</html>
